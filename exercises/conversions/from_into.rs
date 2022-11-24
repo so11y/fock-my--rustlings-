@@ -35,10 +35,30 @@ impl Default for Person {
 // If while parsing the age, something goes wrong, then return the default of Person
 // Otherwise, then return an instantiated Person object with the results
 
-// I AM NOT DONE
 
 impl From<&str> for Person {
     fn from(s: &str) -> Person {
+        let binding = String::from(s);
+        let default = Person::default();
+        let spilit= binding.split(",");
+        let spilitlent:Vec<&str>  =binding.split(",").collect();
+        
+        if spilitlent.len() >2 {
+            return default;
+        } 
+         let value: Vec<&str> = spilit.filter(|&x| x!= "").collect();
+
+        if value.len() != 2 {
+            return default;
+        }
+       if let Err(value)  = value.get(1).unwrap().parse::<i32>(){
+        return default;
+       }
+     
+       Person {
+        name: String::from(*value.get(0).unwrap()),
+        age: value.get(1).unwrap().parse::<i32>().unwrap() as usize
+    }
     }
 }
 

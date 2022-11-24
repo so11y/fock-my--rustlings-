@@ -28,7 +28,6 @@ enum ParsePersonError {
     ParseInt(ParseIntError),
 }
 
-// I AM NOT DONE
 
 // Steps:
 // 1. If the length of the provided string is 0, an error should be returned
@@ -46,8 +45,53 @@ enum ParsePersonError {
 impl FromStr for Person {
     type Err = ParsePersonError;
     fn from_str(s: &str) -> Result<Person, Self::Err> {
+        let str = String::from(s);
+        if str.len() == 0{
+            return Err(ParsePersonError::Empty);
+        }
+        let spilit:Vec<&str> = str.split(",").collect();
+        let name = spilit.get(0);
+        if spilit.len()==1 || spilit.len()>2 {
+            return Err(ParsePersonError::BadLen);
+        }
+        match name{
+            None=>{
+               return  Err(ParsePersonError::NoName);
+            },
+            Some(&value)=>{
+                if value == ""{
+                    return Err(ParsePersonError::NoName);
+                }
+            },
+        }
+        let age = spilit.get(1).unwrap().parse::<usize>().map_err(|x|ParsePersonError::ParseInt(x))?;
+        return Ok( Person{
+            name:String::from(*name.unwrap()),
+            age
+        });
     }
 }
+
+// impl FromStr for Person {
+//     type Err = ParsePersonError;
+//     fn from_str(s: &str) -> Result<Person, Self::Err> {
+//         if s.is_empty() {
+//             return Err(ParsePersonError::Empty);
+//         }
+//         let data = s.split(",").collect::<Vec<&str>>();
+//         match data[..] {
+//             [name, _] if name.is_empty() => Err(ParsePersonError::NoName),
+//             [_, age] if age.parse::<usize>().is_err() => Err(ParsePersonError::ParseInt(
+//                 age.parse::<usize>().unwrap_err(),
+//             )),
+//             [name, age] => Ok(Person {
+//                 name: name.to_string(),
+//                 age: age.parse::<usize>().unwrap(),
+//             }),
+//             _ => Err(ParsePersonError::BadLen),
+//         }
+//     }
+// }
 
 fn main() {
     let p = "Mark,20".parse::<Person>().unwrap();
